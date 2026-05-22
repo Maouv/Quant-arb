@@ -389,7 +389,103 @@ Fill rate 80%: multiply above by 0.8 → 21-30% on $3k
 
 ---
 
-## BAGIAN 10 — VIABILITY VERDICT
+---
+
+## BAGIAN 10 — PARAMETER ROBUSTNESS
+
+### Entry Threshold Sensitivity (Exit fixed 0.02%)
+```
+Entry%   Trades/yr   Avg Net%   Win%   Ann Yld (relative)
+0.02     4,474       0.040%     21%    baseline × 0.49
+0.03     2,598       0.127%     34%    baseline × 0.89
+0.04     1,587       0.235%     48%    baseline × 1.01
+0.05     1,030       0.358%     61%    baseline (chosen)
+0.06       727       0.474%     70%    baseline × 0.93
+0.07       532       0.592%     78%    baseline × 0.85
+0.08       410       0.701%     85%    baseline × 0.78
+0.10       280       0.864%     93%    baseline × 0.66
+0.12       212       0.977%    100%    baseline × 0.56
+0.15       146       1.246%    100%    baseline × 0.49
+```
+
+### Exit Threshold Sensitivity (Entry fixed 0.05%)
+```
+Exit%   Trades/yr   Avg Net%   Win%
+0.00      651       0.950%     71%
+0.01      728       0.788%     66%
+0.02    1,030       0.358%     61%   ← chosen
+0.03    1,190       0.270%     53%
+0.04    1,383       0.196%     46%
+```
+
+### Verdict: ROBUST — Broad Plateau, Not Narrow Peak
+Strategy net positive across entire range tested (0.02%-0.15% entry).
+No cliff. 0.05% chosen as starting point — not a magic number.
+Changing to 0.04% or 0.06% does not materially break strategy.
+
+---
+
+## BAGIAN 11 — PAPER TRADING DURATION
+
+### Statistical Power Analysis
+```
+Trade distribution: mean 0.358%, std 1.129%, Sharpe/trade 0.317
+Win/loss ratio: 13.9:1 (winners large, losers small)
+
+Min trades to detect positive mean (one-sided t-test):
+  80% confidence: 7 trades  = 0.4 weeks
+  90% confidence: 16 trades = 0.8 weeks
+  95% confidence: 27 trades = 1.4 weeks
+
+Bootstrap P(net negative) over N trades:
+  50 trades  (2.5 weeks): ~0%
+  120 trades (6 weeks):   ~0%
+  300 trades (15 weeks):  ~0%
+```
+
+### Verdict: 4-6 Minggu SUFFICIENT secara statistik
+Tapi caveat penting: P(loss) ≈ 0% karena distribusi historical sangat right-skewed.
+**Paper trading tujuannya bukan statistical power — tapi validate:**
+- Actual cost per coin vs flat 0.12% assumption
+- Fill rate realisasi vs theoretical 70-90%
+- Bot execution correctness (orphan orders, timing, etc.)
+
+4-6 minggu tetap minimum. Bukan karena statistik, tapi karena operational validation.
+
+---
+
+## BAGIAN 12 — PRE-SETTLEMENT TIMING ANALYSIS
+
+### Spike Distribution by Settlement Hour
+```
+Hour UTC   Total     Spikes   Spike%   Avg |FR|
+00:00      102,723   3,753    3.7%     0.0145%
+08:00      102,742   3,942    3.8%     0.0149%
+16:00      102,760   3,695    3.6%     0.0144%
+```
+
+Tidak ada jam yang lebih crowded atau lebih favorable.
+Distribusi uniform — tidak ada systematic pattern.
+
+### FR Autocorrelation
+```
+Correlation |FR[t]| vs |FR[t+1]|: 0.635
+```
+Tinggi. Confirms: entering after high-FR settlement adalah valid strategy.
+
+### Entry Timing Rule
+```
+Anytime dalam 8h window = equivalent untuk yield collection.
+Yang penting: JANGAN entry dalam 5 menit terakhir sebelum settlement.
+  → Order mungkin tidak fill sebelum settlement
+  → Miss 1 period tanpa collect FR
+  → Tapi posisi sudah open (half-hedged untuk satu period)
+
+Rule untuk Phase 3: blackout window = T-5 menit sebelum settlement.
+  00:00 UTC: no new entry 23:55-00:00
+  08:00 UTC: no new entry 07:55-08:00
+  16:00 UTC: no new entry 15:55-16:00
+```
 
 ### Strategy VIABLE Dengan Caveats
 
@@ -397,13 +493,15 @@ Fill rate 80%: multiply above by 0.8 → 21-30% on $3k
 ✅ Opportunity frequency sufficient (1,030 trades/year)
 ✅ FR spikes mostly independent (expand universe works)
 ✅ 6 slots capture 92% of opportunities
-✅ Current FR predictive of next FR (95% persistence)
+✅ Current FR predictive of next FR (95% persistence, autocorr 0.635)
 ✅ FR decay gradual — yield collectible over multiple settlements
 ✅ Realistic APY estimate: 24-34% on $3,000 (with fill rate uncertainty)
 ✅ Win/loss ratio 13.9:1 — losers small, winners large
+✅ Parameter robust — broad plateau across 0.02%-0.15% entry threshold
+✅ Settlement timing uniform — no crowded hours, blackout 5min pre-settlement
 
 ⚠️ Cost paradox (high opportunity coins = high cost coins)
-⚠️ Fill rate unknown (70-80% assumption, validate Phase 4)
+⚠️ Fill rate unknown (50-90% range tergantung liquidity, validate Phase 4)
 ⚠️ Survivorship bias (unresolvable, accepted)
 ⚠️ Regime sensitivity untested (validation set reserved)
 ⚠️ 19% trades = instant loss (unavoidable)
@@ -416,7 +514,17 @@ Fill rate 80%: multiply above by 0.8 → 21-30% on $3k
 ## STATUS DOKUMEN
 
 ```
-DRAFT v1.0 — 22 May 2026
+DRAFT v1.1 — 22 May 2026
+Pending review oleh Maou
+
+Next step setelah approved:
+→ Phase 2: Mathematical Framework
+  - Expected annual yield formula (plain language + math)
+  - Position sizing (equal weight, 6 pairs, $300/pair)
+  - Capital allocation dengan 40% buffer — verify buffer adequacy
+  - Break-even threshold per coin
+  - Absolute floor APY untuk rejection criteria
+```
 Pending review oleh Maou
 
 Next step setelah approved:
