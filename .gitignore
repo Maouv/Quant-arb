@@ -1,0 +1,5 @@
+venv/
+funding_rate_data/
+.kiroignore
+funding_rate_data_4h/
+funding_rate_data_8h_expanded/
