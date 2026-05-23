@@ -209,6 +209,11 @@ def main():
         required=True,
         help="Cost tier for symbols without actual Phase 0 costs"
     )
+    parser.add_argument(
+        "--output-dir",
+        default="results",
+        help="Output directory for results (default: results)"
+    )
     
     args = parser.parse_args()
     
@@ -220,7 +225,7 @@ def main():
         sys.exit(1)
     
     # Save results
-    saveResults(results)
+    saveResults(results, outputDir=args.output_dir)
     
     # Print summary
     print(generateReport(results))

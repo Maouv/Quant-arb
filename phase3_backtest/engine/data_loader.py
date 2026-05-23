@@ -86,27 +86,37 @@ def loadFundingRateData(filePath: str) -> Optional[pd.DataFrame]:
 def validateDataDuration(df: pd.DataFrame, symbol: str) -> bool:
     """
     Check if data covers minimum training period.
-    
+
+    IMPORTANT: Duration is measured on training-filtered data only.
+    Raw CSV may contain 2025+ data which must not inflate the duration count.
+
     Args:
-        df: DataFrame with timestamp column
+        df: DataFrame with timestamp column (RAW, unfiltered)
         symbol: Symbol name for logging
-    
+
     Returns:
-        True if data duration >= MIN_TRAINING_MONTHS
+        True if training-period data duration >= MIN_TRAINING_MONTHS
     """
     if df.empty:
         logger.warning(f"No data for {symbol}")
         return False
-    
-    minDate = df["timestamp"].min()
-    maxDate = df["timestamp"].max()
-    
+
+    # Filter to training period BEFORE measuring duration
+    trainingDf = filterTrainingPeriod(df)
+
+    if trainingDf.empty:
+        logger.warning(f"{symbol}: no data in training period, skipping")
+        return False
+
+    minDate = trainingDf["timestamp"].min()
+    maxDate = trainingDf["timestamp"].max()
+
     durationMonths = (maxDate.year - minDate.year) * 12 + (maxDate.month - minDate.month)
-    
+
     if durationMonths < MIN_TRAINING_MONTHS:
         logger.warning(f"{symbol}: {durationMonths} months < {MIN_TRAINING_MONTHS} required, skipping")
         return False
-    
+
     return True
 
 

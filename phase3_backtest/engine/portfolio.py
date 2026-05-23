@@ -23,6 +23,7 @@ class Position:
     entryFr: float              # FR at signal (t)
     entryCollectFr: float       # FR at first collection (t+1)
     costRt: float
+    costTier: str = "tier"
     grossCollected: float = 0.0
     holdSettlements: int = 0
     gapClosed: bool = False
@@ -66,6 +67,7 @@ class Position:
             "gross_dollar": grossDollar,
             "cost_dollar": costDollar,
             "net_dollar": netDollar,
+            "cost_tier": self.costTier,
             "gap_closed": gapClosed,
         }
 
@@ -122,6 +124,7 @@ class Portfolio:
             entryFr=entryFr,
             entryCollectFr=entryCollectFr,
             costRt=costRt,
+            costTier=costTier,
         )
         # Note: First FR is collected in Step 3 (collect phase), not here
         

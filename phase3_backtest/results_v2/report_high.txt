@@ -1,0 +1,138 @@
+======================================================================
+PHASE 3 BACKTEST REPORT
+Cost Tier: HIGH
+======================================================================
+
+--- SUMMARY ---
+Total trades: 1722
+Total P&L: $439.75
+Win rate: 24.7%
+Avg hold: 3.9 settlements
+
+=== MONTHLY STATISTICS ===
+
+Month        Trades    WinRate    AvgNet%     Total$ Flags
+------------------------------------------------------------
+2022-01          66      30.3%    0.0333%      6.59$ LOW_WR
+2022-02          62      22.6%   -0.0580%    -10.78$ LOW_WR
+2022-03          41      19.5%   -0.0718%     -8.83$ LOW_WR
+2022-04          14      28.6%    0.0707%      2.97$ LOW_T,LOW_WR
+2022-05          82      17.1%    0.1009%     24.82$ LOW_WR
+2022-06          71      25.4%    0.1719%     36.61$ LOW_WR
+2022-07          45      24.4%    0.0184%      2.49$ LOW_WR
+2022-08          67      16.4%    0.0136%      2.73$ LOW_WR
+2022-09          85      22.4%   -0.0087%     -2.22$ LOW_WR
+2022-10          60      23.3%    0.0239%      4.30$ LOW_WR
+2022-11          90      27.8%    0.2328%     62.86$ LOW_WR
+2022-12          79      32.9%    0.1863%     44.16$ LOW_WR
+2023-01          59      18.6%    0.0395%      6.99$ LOW_WR
+2023-02          42      23.8%   -0.0032%     -0.41$ LOW_WR
+2023-03          64      26.6%    0.1123%     21.56$ LOW_WR
+2023-04          41      19.5%    0.0709%      8.72$ LOW_WR
+2023-05          47      40.4%    0.1898%     26.76$ 
+2023-06          43      27.9%    0.0521%      6.72$ LOW_WR
+2023-07          47      36.2%    0.1389%     19.58$ LOW_WR
+2023-08          79      13.9%    0.0661%     15.68$ LOW_WR
+2023-09          37      24.3%   -0.0125%     -1.38$ LOW_WR
+2023-10          33      15.2%    0.0172%      1.70$ LOW_WR
+2023-11          49      16.3%   -0.0906%    -13.31$ LOW_WR
+2023-12          66      36.4%    0.0660%     13.07$ LOW_WR
+2024-01          27      37.0%    0.1570%     12.71$ LOW_T,LOW_WR
+2024-02          41      53.7%    0.7751%     95.34$ 
+2024-03          21      47.6%    0.4135%     26.05$ LOW_T
+2024-04          38      23.7%    0.0980%     11.17$ LOW_WR
+2024-05          23      17.4%    0.0690%      4.76$ LOW_T,LOW_WR
+2024-06          26      15.4%   -0.1138%     -8.88$ LOW_T,LOW_WR
+2024-07          20      10.0%   -0.0553%     -3.32$ LOW_T,LOW_WR
+2024-08          37      10.8%   -0.0830%     -9.22$ LOW_WR
+2024-09          26      11.5%    0.2107%     16.43$ LOW_T,LOW_WR
+2024-10          26      26.9%    0.3243%     25.29$ LOW_T,LOW_WR
+2024-11          38      15.8%   -0.0860%     -9.80$ LOW_WR
+2024-12          30      33.3%    0.0866%      7.79$ LOW_WR
+
+=== DRAWDOWN & RISK ANALYSIS ===
+
+--- Drawdown ---
+Max drawdown: $-27.97 (-0.91%)
+Max drawdown duration: 132.0 days
+
+--- Consecutive Losses ---
+Max consecutive losing trades: 20
+Max consecutive negative days: 17
+
+--- Short Hold Fragility (<=3 settlements) ---
+Short hold trades: 1194
+Short hold net total: $-534.80
+Short hold win rate: 3.6%
+
+--- Phase 1 vs Phase 3 Reconciliation ---
+Phase 1 overstatement total: $-205.69
+Avg overstatement/trade: $-0.1195
+
+=== DECAY MODEL VALIDATION ===
+
+Bucket            Trades   Predicted%    Actual%       Gap%
+------------------------------------------------------------
+hold_1               668      0.0877%    0.0094%   -0.0783%
+hold_2               330      0.1537%    0.0635%   -0.0902%
+hold_3               196      0.2924%    0.1470%   -0.1453%
+hold_4_6             283      0.4248%    0.3493%   -0.0755%
+hold_7_10            135      0.6191%    0.7397%    0.1206%
+hold_11_plus         110      0.5159%    2.0843%    1.5685%
+
+
+=== LUNA STRESS TEST ===
+Period: 2022-05-01 to 2022-05-31
+
+--- SURVIVAL ---
+Trades in window: 83
+Net yield (1x cost): $31.68
+Net yield (2x cost): $-16.55
+Net yield (3x cost): $-64.78
+Net yield (4x cost): $-113.01
+Net yield (5x cost): $-161.24
+Net yield (6x cost): $-209.47
+Break-even multiplier: 1x
+
+--- RECOVERY (90 days) ---
+Recovery trades: 175
+Max drawdown: $-11.71
+Recovery time: 1 days
+
+
+=== FTX STRESS TEST ===
+Period: 2022-11-01 to 2022-11-30
+
+--- SURVIVAL ---
+Trades in window: 90
+Net yield (1x cost): $62.86
+Net yield (2x cost): $10.91
+Net yield (3x cost): $-41.05
+Net yield (4x cost): $-93.00
+Net yield (5x cost): $-144.95
+Net yield (6x cost): $-196.90
+Break-even multiplier: 2x
+
+--- RECOVERY (90 days) ---
+Recovery trades: 183
+Max drawdown: $-14.77
+Recovery time: 5 days
+
+
+=== BTC STRESS TEST ===
+Period: 2024-08-01 to 2024-08-31
+
+--- SURVIVAL ---
+Trades in window: 37
+Net yield (1x cost): $-9.22
+Net yield (2x cost): $-30.69
+Net yield (3x cost): $-52.15
+Net yield (4x cost): $-73.62
+Net yield (5x cost): $-95.09
+Net yield (6x cost): $-116.56
+Break-even multiplier: 1x
+
+--- RECOVERY (90 days) ---
+Recovery trades: 89
+Max drawdown: $-15.73
+Recovery time: 13 days

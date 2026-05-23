@@ -1,0 +1,48 @@
+============================================================
+PHASE 3 STATISTICAL BATTERY — results_v2/trade_log_mid.csv
+============================================================
+Trades analyzed: 1720
+Total net (observed): $833.56
+Bootstrap iterations: 10,000
+
+B1 — Trade Bootstrap CI (95%)
+  CI lower:      $644.10
+  CI upper:      $1038.47
+  prob_negative: 0.0000
+  Pass (< 0.025): PASS
+
+B2 — Block Bootstrap by Month (95%)
+  Months:    36
+  CI lower:  $575.76
+  CI upper:  $1138.61
+  Pass (lower > 0): PASS
+
+B3 — Sign Randomization
+  Observed total: $833.56
+  p-value:        0.0000
+  Pass (< 0.01):  PASS
+
+B4 — Cost Gradient
+  cost=0.06%: $1128.22
+  cost=0.08%: $1030.00
+  cost=0.10%: $931.78
+  cost=0.12%: $833.56
+  cost=0.14%: $735.34
+  cost=0.16%: $637.12
+  cost=0.18%: $538.90
+  cost=0.20%: $440.68
+  cost=0.22%: $342.46
+  cost=0.24%: $244.24
+  cost=0.26%: $146.02
+  Break-even cost: 0.26%
+  Pass (>= 0.18%): PASS
+
+============================================================
+SUMMARY
+============================================================
+  B1: PASS
+  B2: PASS
+  B3: PASS
+  B4: PASS
+
+  Overall: ALL PASS
