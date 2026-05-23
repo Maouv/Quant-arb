@@ -163,20 +163,20 @@ FR_min(n) = cost_rt × (1 - d) / (1 - d^n)
 | n (settlements) | FR_min(n) untuk cost 0.12% | FR_min(n) untuk cost 0.20% |
 |-----------------|---------------------------|---------------------------|
 | 1               | 0.120%                    | 0.200%                    |
-| 2               | 0.078%                    | 0.131%                    |
-| 3               | 0.059%                    | 0.099%                    |
-| 5               | 0.040%                    | 0.066%                    |
-| 10              | 0.025%                    | 0.042%                    |
+| 2               | 0.068%                    | 0.113%                    |
+| 3               | 0.050%                    | 0.084%                    |
+| 5               | 0.037%                    | 0.062%                    |
+| 10              | 0.029%                    | 0.048%                    |
 
 **Untuk expected hold = 5.9 settlements (avg dari Phase 1):**
 ```
-FR_min_expected ≈ 0.040% (cost 0.12%)
-FR_min_expected ≈ 0.066% (cost 0.20%)
+FR_min_expected ≈ 0.035% (cost 0.12%)
+FR_min_expected ≈ 0.058% (cost 0.20%)
 ```
 
 **Ini menjelaskan mengapa entry threshold 0.05% works:**
-- Pada cost 0.12%: 0.05% > 0.040% → net positive dalam expectation ✅
-- Pada cost 0.20%: 0.05% < 0.066% → net negatif dalam expectation ❌
+- Pada cost 0.12%: 0.05% > 0.035% → net positive dalam expectation ✅
+- Pada cost 0.20%: 0.05% < 0.058% → net negatif dalam expectation ❌
 
 ### Level 3: Strategy-Level Break-even (Dynamic Cost Filter)
 
@@ -204,15 +204,15 @@ trades yang hanya marginally profitable.
 ```
                     Cost 0.08%  Cost 0.12%  Cost 0.20%
 Single settlement:  0.080%      0.120%      0.200%
-Expected (avg hold):0.034%      0.040%      0.066%
+Expected (avg hold):0.023%      0.035%      0.058%
 Entry threshold:    0.050%      0.050%      0.050%
 
-Strategy viable?    ✅ yes       ✅ yes       ⚠️ borderline
-                    (0.05 > 0.034)(0.05>0.040)(0.05<0.066)
+Strategy viable?    ✅ yes       ✅ yes       ❌ no
+                    (0.05>0.023) (0.05>0.035) (0.05<0.058)
 ```
 
-Coin dengan cost 0.20% (seperti ADA, NEAR) secara matematis borderline pada entry 0.05%.
-Dynamic cost filter akan naturally skip mereka kecuali FR spike > 0.066%.
+Coin dengan cost 0.20% (seperti ADA, NEAR) secara matematis tidak viable pada entry 0.05%.
+Dynamic cost filter akan naturally skip mereka kecuali FR spike > 0.058%.
 
 
 ---
@@ -428,7 +428,7 @@ Keduanya harus dipenuhi. Jika salah satu gagal → reject.
 ### Formula Canonical
 
 ```
-1. APY = T × κ × φ × [(1 - b) / S] × (FR_avg - cost_rt) / C
+1. APY = T × κ × φ × [(1 - b) / S] × net_avg
 
    Variabel tetap (dari Phase 0–1):
    T = 1,030    κ = 0.92    b = 0.40    S = 6    C = $3,000
@@ -456,8 +456,8 @@ Keduanya harus dipenuhi. Jika salah satu gagal → reject.
    buffer_actual = $1,200   → adequate (5.3x margin)
 
 4. Absolute floor:
-   APY_floor = T × κ × φ_min × [(1-b)/S] × net_avg_worst / C
-             = 1,030 × 0.92 × 0.50 × (0.60/6) × 0.00278 / ... 
+   APY_floor = T × κ × φ_min × [(1-b)/S] × net_avg_worst
+             = 1,030 × 0.92 × 0.50 × (0.60/6) × 0.00278
              = 13.2%
 
    Reject jika paper trading APY < 13.2%
