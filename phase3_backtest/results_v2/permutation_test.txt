@@ -1,0 +1,11 @@
+=== C1 PERMUTATION TEST RESULTS ===
+N permutations: 100
+Real net:            $833.56
+Null mean:           $-1100.06
+Null std:            $12.33
+Null p5:             $-1120.08
+Null p50:            $-1100.49
+Null p95:            $-1078.85
+Real net percentile: 100.0th
+p-value:             0.0000
+Pass (p95+):         PASS

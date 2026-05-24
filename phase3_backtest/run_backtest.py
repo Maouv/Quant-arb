@@ -211,21 +211,41 @@ def main():
     )
     parser.add_argument(
         "--output-dir",
-        default="results",
-        help="Output directory for results (default: results)"
+        default=None,
+        help="Output directory for results"
     )
-    
+    parser.add_argument(
+        "--period",
+        choices=["training", "validation"],
+        default="training",
+        help="Period to run: training (2022-2024) or validation (2025)"
+    )
+
     args = parser.parse_args()
-    
+
+    # Override date range for validation period — engine logic unchanged
+    if args.period == "validation":
+        import config as _cfg
+        import engine.data_loader as _dl
+        _cfg.TRAINING_START = "2025-01-01"
+        _cfg.TRAINING_END = "2025-12-31"
+        _cfg.MIN_TRAINING_MONTHS = 0  # single-year OOS: duration filter not applicable
+        _dl.TRAINING_START = "2025-01-01"
+        _dl.TRAINING_END = "2025-12-31"
+        _dl.MIN_TRAINING_MONTHS = 0
+        logger.info("Period=validation: date range overridden to 2025-01-01 — 2025-12-31")
+
+    outputDir = args.output_dir or ("results_validation" if args.period == "validation" else "results")
+
     # Run backtest
     results = runBacktest(args.tier)
     
     if not results:
         logger.error("Backtest failed")
         sys.exit(1)
-    
+
     # Save results
-    saveResults(results, outputDir=args.output_dir)
+    saveResults(results, outputDir=outputDir)
     
     # Print summary
     print(generateReport(results))
