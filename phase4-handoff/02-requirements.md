@@ -104,10 +104,19 @@ BACKTEST_APY_MID: float         = 28.0   # dari Phase 3 results_v2
 108 coins 8h interval, no volume filter. Criteria:
 ```
 1. Ada spot USDT + perpetual futures USDT-margined di Binance
-2. Funding interval 8 jam
+2. Funding interval 8 jam (verify saat startup)
 3. Bukan stablecoin / wrapped token
 4. Bukan NEARUSDT
 ```
+
+`fundingIntervalHours` tidak tersedia di API — tidak bisa di-fetch dynamically.
+Universe di-hardcode di config.py sebagai `UNIVERSE_8H` (list 108 symbols).
+
+Saat startup, filter dengan dua checks:
+1. `exchangeInfo` status = "TRADING" → exclude delist/suspend
+2. Interval check: fetch 2 last funding records per coin, hitung gap.
+   Kalau gap < 7 jam → interval berubah ke 4h, exclude + log WARNING.
+   (MTLUSDT/SOLUSDT/XVGUSDT pernah berubah interval secara historical — sudah 8h lagi sekarang)
 
 Volume filter di-drop (look-ahead bias, redundant dengan dynamic cost filter).
 ⚠️ Dynamic cost filter HARUS bekerja benar — kalau ada bug, bot bisa entry ke coins illiquid.
@@ -116,10 +125,79 @@ Test wajib:
 - Verify coins dengan spread > 0.5% tidak pernah ter-entry
 - Verify log menunjukkan coins illiquid di-skip dengan alasan "net_expected < threshold"
 
-Tidak perlu hardcode list — scan dari Binance API saat startup.
-Expected universe: ~100-110 coins (minus delist/suspend sejak training).
-
 Expand ke 4h coins = Phase 5 territory.
+
+---
+
+## ACTUAL COST LOGGING
+
+Setelah setiap trade closed, hitung dan log actual RT cost:
+
+```python
+actual_cost_rt_pct = (
+    abs(actual_fill_price_spot - mid_price_spot_at_order) / mid_price_spot_at_order
+    + abs(actual_fill_price_futures - mid_price_futures_at_order) / mid_price_futures_at_order
+    + TAKER_FEE * 4   # spot entry, spot exit, futures entry, futures exit
+) * 100
+```
+
+Di mana `mid_price = (bid + ask) / 2` saat order di-place. Simpan mid price saat order dikirim.
+
+Validasi di akhir Phase 4:
+```
+actual_cost_avg = mean(actual_cost_rt_pct) semua trades
+< 0.12% → backtest conservative ✅
+> 0.12% → backtest optimistic ⚠️ → update cost assumption sebelum Phase 5
+```
+
+---
+
+## DATA FETCH PER CYCLE
+
+**Batch (semua coins, 1 call masing-masing):**
+```
+GET /fapi/v1/premiumIndex      → lastFundingRate, markPrice, nextFundingTime
+GET /fapi/v1/ticker/bookTicker → bid/ask futures
+GET /api/v3/ticker/bookTicker  → bid/ask spot
+GET /fapi/v1/positionRisk      → open positions
+GET /fapi/v1/openOrders        → open regular futures orders
+GET /fapi/v1/algo/orders/open  → open algo orders (SL/TP)
+GET /api/v3/openOrders         → open spot orders
+```
+
+**Per kandidat (hanya coins yang lolos FR pre-filter):**
+```
+GET /fapi/v1/depth?symbol=X&limit=5  → slippage futures
+GET /api/v3/depth?symbol=X&limit=5   → slippage spot
+```
+Pre-filter: `lastFundingRate - spread_estimate > MIN_PROFIT_THRESHOLD` sebelum fetch depth.
+Typical candidates: 2-5 coins. Rate limit aman.
+
+**Startup saja (cache di memory):**
+```
+GET /fapi/v1/exchangeInfo → MIN_NOTIONAL + interval check
+GET /fapi/v2/balance + /api/v3/account → balance awal
+```
+
+**Balance re-fetch:**
+```python
+BALANCE_REFRESH_INTERVAL = 3600   # 1 jam
+BALANCE_REFRESH_AFTER_TRADE = True  # selalu refresh setelah trade
+# sizePerPair = effectiveBalance / MAX_PAIRS (recompute setiap refresh)
+```
+
+---
+
+## COST SPIKE BASE
+
+Priority untuk base cost di `isCostSpike()`:
+```
+1. Rolling average dari paper trading (cost_cache.py) — paling akurat
+2. DEFAULT_COST_TIER = 0.12% — fallback sebelum rolling avg terbentuk
+```
+
+Phase 0 sampling (11 coins) tidak dipakai sebagai hardcode base — snapshot satu hari,
+tidak representatif sebagai "normal cost". Rolling average lebih valid.
 
 ---
 
